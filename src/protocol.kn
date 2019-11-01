@@ -1,0 +1,262 @@
++enum httpVersion
+	http10
+	http11
+	http20
+	http30
+end enum
+
++enum StatusCode
+	; @see https://developer.mozilla.org/ja/docs/Web/HTTP/Status
+	continue :: 100
+	switchingProtocol :: 101
+	processing :: 102
+	earlyHints :: 103
+	
+	ok :: 200
+	created :: 201
+	accepted :: 202
+	nonAuthoritativeInformation :: 203
+	noContent :: 204
+	resetContent :: 205
+	partialContent :: 206
+	multiStatus :: 207
+	alreadyReported :: 208
+	imUsed :: 226
+	
+	multipleChoice :: 300
+	movedPermanently :: 301
+	found :: 302
+	seeOther :: 303
+	notModified :: 304
+	useProxy :: 305
+	temporaryRedirect :: 307
+	permanentRedirect :: 308
+	
+	badRequest :: 400
+	unauthorized :: 401
+	paymentRequired :: 402
+	forbidden :: 403
+	notFound :: 404
+	methodNotAllowed :: 405
+	notAcceptable :: 406
+	proxyAuthenticationRequired :: 407
+	requestTimeout :: 408
+	conflict :: 409
+	gone :: 410
+	lengthRequired :: 411
+	preconditionFailed :: 412
+	payloadTooLarge :: 413
+	uriTooLong :: 414
+	unsupportedMediaType :: 415
+	requestedRangeNotSatisfiable :: 416
+	expectationFailed :: 417
+	imATeapot :: 418
+	misdirectedRequest :: 421
+	unprocessableEntity :: 422
+	locked :: 423
+	failedDependency :: 424
+	tooEarly :: 425
+	upgradeRequired :: 426
+	preconditionRequired :: 428
+	tooManyRequests :: 429
+	requestHeaderFieldsTooLarge :: 431
+	unavailableForLegalReasons :: 451
+	
+	internalServerError :: 500
+	notImplemented :: 501
+	badGateway :: 502
+	serviceUnavailable :: 503
+	gatewayTimeout :: 504
+	httpVersionNotSupported :: 505
+	variantAlsoNegotiates :: 506
+	insufficientStorage :: 507
+	loopDetected :: 508
+	notExtended :: 510
+	networkAuthenticationRequired :: 511
+end enum
+
++enum Verb
+	GET
+	HEAD
+	POST
+	PUT
+	DELETE
+	CONNECT
+	OPTIONS
+	TRACE
+	PATCH
+end enum
+
++class Protocol()
+	
+	+func getHttpVersionStr(httpVersionInt: @httpVersion): []char
+		switch(httpVersionInt)
+		case %http10
+			ret "HTTP/1.0"
+		case %http11
+			ret "HTTP/1.1"
+		case %http20
+			ret "HTTP/2.0"
+			;case @httpVersion % http30
+			;ret "HTTP/3.0"
+		end switch
+	end func
+	
+	+func getStatusReasonPhraseFromCode(code: @StatusCode): []char
+		switch(code)
+		case %continue
+			ret "Continue"
+		case %switchingProtocol
+			ret "Switching Protocol"
+		case %processing
+			ret "Processing"
+		case %earlyHints
+			ret "Early Hints"
+			
+		case %ok
+			ret "OK"
+		case %created
+			ret "Created"
+		case %accepted
+			ret "Accepted"
+		case %nonAuthoritativeInformation
+			ret "Non Authoritative Information"
+		case %noContent
+			ret "No Content"
+		case %resetContent
+			ret "Reset Content"
+		case %partialContent
+			ret "Partial Content"
+		case %multiStatus
+			ret "Multi Status"
+		case %alreadyReported
+			ret "Already Reported"
+		case %imUsed
+			ret "Im Used"
+			
+		case %multipleChoice
+			ret "Multiple Choice"
+		case %movedPermanently
+			ret "Moved Permanently"
+		case %found
+			ret "Found"
+		case %seeOther
+			ret "See Other"
+		case %notModified
+			ret "Not Modified"
+		case %useProxy
+			ret "Use Proxy"
+		case %temporaryRedirect
+			ret "Temporary Redirect"
+		case %permanentRedirect
+			ret "Permanent Redirect"
+			
+		case %badRequest
+			ret "Bad Request"
+		case %unauthorized
+			ret "Unauthorized"
+		case %paymentRequired
+			ret "Payment Required"
+		case %forbidden
+			ret "Forbidden"
+		case %notFound
+			ret "Not Found"
+		case %methodNotAllowed
+			ret "Method Not Allowed"
+		case %notAcceptable
+			ret "Not Acceptable"
+		case %proxyAuthenticationRequired
+			ret "Proxy Authentication Required"
+		case %requestTimeout
+			ret "Request Timeout"
+		case %conflict
+			ret "Conflict"
+		case %gone
+			ret "Gone"
+		case %lengthRequired
+			ret "Length Required"
+		case %preconditionFailed
+			ret "Precondition Failed"
+		case %payloadTooLarge
+			ret "Payload Too Large"
+		case %uriTooLong
+			ret "Uri Too Long"
+		case %unsupportedMediaType
+			ret "Unsupported Media Type"
+		case %requestedRangeNotSatisfiable
+			ret "Requested Range Not Satisfiable"
+		case %expectationFailed
+			ret "Expectation Failed"
+		case %imATeapot
+			ret "Im A Teapot"
+		case %misdirectedRequest
+			ret "Misdirected Request"
+		case %unprocessableEntity
+			ret "Unprocessable Entity"
+		case %locked
+			ret "locked"
+		case %failedDependency
+			ret "Failed Dependency"
+		case %tooEarly
+			ret "Too Early"
+		case %upgradeRequired
+			ret "Upgrade Required"
+		case %preconditionRequired
+			ret "Precondition Required"
+		case %tooManyRequests
+			ret "Too Many Requests"
+		case %requestHeaderFieldsTooLarge
+			ret "Request Header Fields Too Large"
+		case %unavailableForLegalReasons
+			ret "Unavailable For Legal Reasons"
+			
+		case %internalServerError
+			ret "Internal Server Error"
+		case %notImplemented
+			ret "Not Implemented"
+		case %badGateway
+			ret "Bad Gateway"
+		case %serviceUnavailable
+			ret "Service Unavailable"
+		case %gatewayTimeout
+			ret "Gateway Timeout"
+		case %httpVersionNotSupported
+			ret "Http Version Not Supported"
+		case %variantAlsoNegotiates
+			ret "Variant Also Negotiates"
+		case %insufficientStorage
+			ret "Insufficient Storage"
+		case %loopDetected
+			ret "Loop Detected"
+		case %notExtended
+			ret "Not Extended"
+		case %networkAuthenticationRequired
+			ret "Network Authentication Required"
+		default
+			ret "Unknown Code"
+		end switch
+	end func
+	
+	+func getVerbStr(verb: @Verb): []char
+		switch(verb)
+		case %GET
+			ret "GET"
+		case %HEAD
+			ret "HEAD"
+		case %POST
+			ret "POST"
+		case %PUT
+			ret "PUT"
+		case %DELETE
+			ret "DELETE"
+		case %CONNECT
+			ret "CONNECT"
+		case %OPTIONS
+			ret "OPTIONS"
+		case %TRACE
+			ret "TRACE"
+		case %PATCH
+			ret "PATCH"
+		end switch
+	end func
+end class
