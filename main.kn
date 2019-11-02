@@ -1,4 +1,15 @@
 func main()
 	var request: \src\request@Request :: #\src\request@Request
-	var verb: \src\protocol@Verb :: %GET
+	do request.setHeader("Host", "kuina.ch")
+	var data: []bit8
+	var conn: net@Tcp :: request.get("http://kuina.ch/kuin/spec5")
+	for(0, 0)
+		while(data =& null)
+			do data :: conn.receive(200)
+		end while
+		for count(0, ^data - 1)
+			do cui@print([data[count] $ char])
+		end for
+	end for
+	;do cui@print((^data).toStr())
 end func

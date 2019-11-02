@@ -1,0 +1,50 @@
++class Url()
+	var protocol: \src\protocol@Protocol
+	
+	*func ctor()
+		do me.protocol :: #\src\protocol@Protocol
+	end func
+	
+	+func getSchemeFromUrl(url: []char): \src\protocol@Scheme
+		var schemeStr: []char :: url.split(":")[0]
+		ret me.protocol.getSchemeFromStr(schemeStr)
+	end func
+	
+	+func getHostFromUrl(url: []char): []char
+		var parsingHost: []char :: (url.split("://")[1]).split("/")[0]
+		var host: []char
+		if(^(parsingHost.split("@")) >= 2)
+			; ユーザーディレクティブがある
+			var hostWithPort: []char :: parsingHost.split("@")[1]
+			do host :: hostWithPort.split(":")[0]
+		else
+			;ユーザーディレクティブがない
+			do host :: parsingHost.split(":")[0]
+		end if
+		ret host
+	end func
+	
+	+func getPortFromUrl(url: []char): int
+		; ポートがない、又は不正ならば0を返す
+		var parsingHost: []char :: (url.split("://")[1]).split("/")[0]
+		var port: int
+		if(^(parsingHost.split("@")) >= 2)
+			; ユーザーディレクティブがある
+			do parsingHost :: parsingHost.split("@")[1]
+		end if
+		if(^(parsingHost.split(":")) >= 2)
+			var success: bool
+			do port :: (parsingHost.split(":")[1]).toInt(&success)
+			if(!success)
+				do port :: 0
+			end if
+		else
+			do port :: 0
+		end if
+		ret port
+	end func
+	
+	+func getPathFromUrl(url: []char): []char
+		ret(url.split("://")[1]).split("/").sub(1, -1).join("/")
+	end func
+end class

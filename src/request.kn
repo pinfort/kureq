@@ -2,16 +2,32 @@
 	var protocol: \src\protocol@Protocol
 	var header: dict<[]char, []char>
 	var httpVersion: \src\protocol@httpVersion
+	var url: \src\url@Url
 	
 	*func ctor()
 		do me.protocol :: #\src\protocol@Protocol
 		do me.header :: #dict<[]char, []char>
 		do me.httpVersion :: %http11
+		do me.url :: #\src\url@Url
 	end func
 	
-	+func get(path: []char)
+	+func get(url: []char): net@Tcp
 		var verb: \src\protocol@Verb :: %GET
-		var requestStr: []char :: me.buildRequest(verb, path, "")
+		var requestStr: []char :: me.buildRequest(verb, me.url.getPathFromUrl(url), "")
+		var conn: net@Tcp :: me.createConnection(url)
+		if(conn =& null)
+			throw 1
+		end if
+		var requestBin: []bit8
+		for binarify(0, ^requestStr - 1)
+			if(requestBin =& null)
+				do requestBin :: [requestStr[binarify] $ bit8]
+			else
+				do requestBin :~ [requestStr[binarify] $ bit8]
+			end if
+		end for
+		do conn.send(requestBin)
+		ret conn
 	end func
 	
 	func buildRequestLine(verb: \src\protocol@Verb, path: []char): []char
@@ -69,5 +85,14 @@
 	
 	+func setHttpVersion(version: \src\protocol@httpVersion)
 		do me.httpVersion :: version
+	end func
+	
+	func createConnection(url: []char): net@Tcp
+		var host: []char :: me.url.getHostFromUrl(url)
+		var port: int :: me.url.getPortFromUrl(url)
+		if(port = 0)
+			do port :: me.protocol.getDefaultPortFromScheme(me.url.getSchemeFromUrl(url))
+		end if
+		ret net@makeTcpClient(host, port)
 	end func
 end class

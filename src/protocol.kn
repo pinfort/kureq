@@ -87,8 +87,12 @@ end enum
 	PATCH
 end enum
 
++enum Scheme
+	HTTP
+	HTTPS
+end enum
+
 +class Protocol()
-	
 	+func getHttpVersionStr(httpVersionInt: @httpVersion): []char
 		switch(httpVersionInt)
 		case %http10
@@ -101,7 +105,7 @@ end enum
 			;ret "HTTP/3.0"
 		end switch
 	end func
-	
+
 	+func getStatusReasonPhraseFromCode(code: @StatusCode): []char
 		switch(code)
 		case %continue
@@ -257,6 +261,28 @@ end enum
 			ret "TRACE"
 		case %PATCH
 			ret "PATCH"
+		end switch
+	end func
+	
+	+func getSchemeFromStr(schemeStr: []char): @Scheme
+		var scheme: @Scheme
+		switch(schemeStr)
+		case "http"
+			do scheme :: %HTTP
+		case "https"
+			do scheme :: %HTTPS
+		end switch
+		ret scheme
+	end func
+	
+	+func getDefaultPortFromScheme(scheme: @Scheme): int
+		switch(scheme)
+		case %HTTP
+			ret 80
+		case %HTTPS
+			ret 443
+		default
+			ret 80
 		end switch
 	end func
 end class
