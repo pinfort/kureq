@@ -1,98 +1,39 @@
 +class Request()
 	var protocol: \src\protocol@Protocol
-	var header: dict<[]char, []char>
-	var httpVersion: \src\protocol@httpVersion
-	var url: \src\url@Url
 	
 	*func ctor()
 		do me.protocol :: #\src\protocol@Protocol
-		do me.header :: #dict<[]char, []char>
-		do me.httpVersion :: %http11
-		do me.url :: #\src\url@Url
 	end func
 	
-	+func get(url: []char): net@Tcp
-		var verb: \src\protocol@Verb :: %GET
-		var requestStr: []char :: me.buildRequest(verb, me.url.getPathFromUrl(url), "")
-		var conn: net@Tcp :: me.createConnection(url)
-		if(conn =& null)
-			throw 1
-		end if
-		var requestBin: []bit8
-		for binarify(0, ^requestStr - 1)
-			if(requestBin =& null)
-				do requestBin :: [requestStr[binarify] $ bit8]
-			else
-				do requestBin :~ [requestStr[binarify] $ bit8]
+	+func get(url: []char): []char
+		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: \previous_research\pinfort\kuurl\src\curl@makeCurl()
+		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
+		do curl.easy_setopt_str(curlopt_url $ int, "http://www.yahoo.co.jp")
+		
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		
+		do curl.config_easy_response(&response)
+		do curl.config_easy_header(&response)
+		
+		var resCode: int :: curl.easy_perform()
+		
+		var curle_ok: \previous_research\pinfort\kuurl\src\curl@CurlCode :: %OK
+		if(resCode = (curle_ok $ int))
+			var res: []char :: ""
+			if(response.header <>& null)
+				do res :: res ~ response.header
 			end if
-		end for
-		do conn.send(requestBin)
-		ret conn
-	end func
-	
-	func buildRequestLine(verb: \src\protocol@Verb, path: []char): []char
-		var httpVersion: \src\protocol@httpVersion :: %http11
-		ret[me.protocol.getVerbStr(verb), path, me.protocol.getHttpVersionStr(httpVersion)].join(" ") ~ "\n"
-	end func
-	
-	func buildHeader(): []char
-		class headerContainer()
-			+var headerStr: []char
-		end class
-		
-		func formatHeader(key: []char, value: []char, data: headerContainer): bool
-			do data.headerStr :~ (key ~ ": " ~ value ~ "\n")
-			ret true
-		end func
-		
-		var formattedHeaderContainer: headerContainer :: #headerContainer
-		do formattedHeaderContainer.headerStr :: ""
-		
-		do me.header.forEach(formatHeader, formattedHeaderContainer)
-		ret formattedHeaderContainer.headerStr ~ "\n"
-	end func
-	
-	func buildRequest(verb: \src\protocol@Verb, path: []char, body: []char): []char
-		var requestLine: []char :: me.buildRequestLine(verb, path)
-		var header: []char :: me.buildHeader()
-		
-		ret requestLine ~ header ~ "\n" ~ body
-	end func
-	
-	func mergeHeader(new: dict<[]char, []char>): dict<[]char, []char>
-		var newHeaderContainer: headerContainer :: #headerContainer
-		do newHeaderContainer.header :: #dict<[]char, []char>
-		do me.header.forEach(merge, newHeaderContainer)
-		
-		func merge(key: []char, value: []char, newHeaderContainer: headerContainer): bool
-			do newHeaderContainer.header.add(key, value)
-		end func
-		
-		class headerContainer()
-			+var header: dict<[]char, []char>
-		end class
-		
-		ret newHeaderContainer.header
-	end func
-	
-	+func setHeader(key: []char, value: []char)
-		do me.header.add(key, value)
-	end func
-	
-	+func setHeaders(headers: dict<[]char, []char>)
-		do me.header :: me.mergeHeader(headers)
-	end func
-	
-	+func setHttpVersion(version: \src\protocol@httpVersion)
-		do me.httpVersion :: version
-	end func
-	
-	func createConnection(url: []char): net@Tcp
-		var host: []char :: me.url.getHostFromUrl(url)
-		var port: int :: me.url.getPortFromUrl(url)
-		if(port = 0)
-			do port :: me.protocol.getDefaultPortFromScheme(me.url.getSchemeFromUrl(url))
+			
+			if(response.body <>& null)
+				do res :: res ~ "\n\n" ~ response.body
+			end if
+			do curl.easy_cleanup()
+			ret res
 		end if
-		ret net@makeTcpClient(host, port)
+		
+		do cui@print(resCode.toStr() ~ "\n")
+		do cui@print("some error occored...\n")
+		do curl.easy_cleanup()
+		ret ""
 	end func
 end class
