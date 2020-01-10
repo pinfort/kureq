@@ -36,4 +36,4 @@ Content-Length: 1
 ```
 
 ## info
-No verb supported yet without GET.
+No verb other than GET supported yet.
