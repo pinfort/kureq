@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<icon></icon>
+	<env>cui</env>
+	<snap>5</snap>
+	<zoom>1</zoom>
+	<related_files>
+		<path>./previous_research/pinfort/kuurl/dlls/curl_kuin_bridge.dll</path>
+		<path>./previous_research/pinfort/kuurl/dlls/libcurl-x64.dll</path>
+	</related_files>
+	<resources>
+		<resource>previous_research\pinfort\kuurl\src\curl.kn</resource>
+		<resource>previous_research\pinfort\kuurl\src\curl.code.kn</resource>
+		<resource>previous_research\pinfort\kuurl\src\curl.option.kn</resource>
+		<resource>previous_research\pinfort\kuurl\src\curl.response.kn</resource>
+		<resource>src\protocol.kn</resource>
+		<resource>src\request.kn</resource>
+		<resource>src\response.kn</resource>
+		<resource>src\url.kn</resource>
+	</resources>
+</configuration>
