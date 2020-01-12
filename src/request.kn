@@ -5,10 +5,34 @@
 		do me.protocol :: #\src\protocol@Protocol
 	end func
 	
+	func init(): \previous_research\pinfort\kuurl\src\curl@Curl
+		ret \previous_research\pinfort\kuurl\src\curl@makeCurl()
+	end func
+	
+	func clean(curl: \previous_research\pinfort\kuurl\src\curl@Curl)
+		do curl.easy_cleanup()
+	end func
+	
+	func errCheck(responseCode: int, curl: \previous_research\pinfort\kuurl\src\curl@Curl)
+		var curle_ok: \previous_research\pinfort\kuurl\src\curl@CurlCode :: %OK
+		
+		if(responseCode = (curle_ok $ int))
+			; 正常。何もせずに戻る
+			ret
+		end if
+		
+		; 異常。throwして停止
+		var curlCodeName: \previous_research\pinfort\kuurl\src\curl@CurlCodeName :: #\previous_research\pinfort\kuurl\src\curl@CurlCodeName
+		do cui@print("ERRORCODE: " ~ responseCode.toStr() ~ "\n")
+		do cui@print("ERROR: " ~ curlCodeName.fromCode(responseCode) ~ "\n")
+		do me.clean(curl)
+		throw excpt@userMin {TODO: エラーコードを考える}
+	end func
+	
 	+func get(url: []char): []char
-		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: \previous_research\pinfort\kuurl\src\curl@makeCurl()
+		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
-		do curl.easy_setopt_str(curlopt_url $ int, "http://www.yahoo.co.jp")
+		do curl.easy_setopt_str(curlopt_url $ int, url)
 		
 		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
 		
@@ -16,24 +40,78 @@
 		do curl.config_easy_header(&response)
 		
 		var resCode: int :: curl.easy_perform()
+		do me.errCheck(resCode, curl)
 		
-		var curle_ok: \previous_research\pinfort\kuurl\src\curl@CurlCode :: %OK
-		if(resCode = (curle_ok $ int))
-			var res: []char :: ""
-			if(response.header <>& null)
-				do res :: res ~ response.header
-			end if
-			
-			if(response.body <>& null)
-				do res :: res ~ "\n\n" ~ response.body
-			end if
-			do curl.easy_cleanup()
-			ret res
+		var res: []char :: ""
+		if(response.header <>& null)
+			do res :: res ~ response.header
 		end if
 		
-		do cui@print(resCode.toStr() ~ "\n")
-		do cui@print("some error occored...\n")
-		do curl.easy_cleanup()
-		ret ""
+		if(response.body <>& null)
+			if(^res = 0)
+				do res :: response.body
+			else
+				do res :: res ~ "\n\n" ~ response.body
+			end if
+		end if
+		
+		do me.clean(curl)
+		ret res
+	end func
+	
+	+func head(url: []char): []char
+		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
+		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
+		do curl.easy_setopt_str(curlopt_url $ int, url)
+		
+		; TODO: なんでこれじゃダメか調べる
+		;var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %NOBODY
+		;do curl.easy_setopt_int(curlopt_head $ int, 1)
+		
+		var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %CUSTOMREQUEST
+		do curl.easy_setopt_str(curlopt_head $ int, "HEAD")
+		
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		
+		do curl.config_easy_header(&response)
+		
+		var resCode: int :: curl.easy_perform()
+		do me.errCheck(resCode, curl)
+		
+		var res: []char :: ""
+		if(response.header <>& null)
+			do res :: res ~ response.header
+		end if
+		
+		do me.clean(curl)
+		ret res
+	end func
+	
+	+func post(url: []char): []char
+		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
+		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
+		do curl.easy_setopt_str(curlopt_url $ int, url)
+		
+		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %POSTFIELDS
+		do curl.easy_setopt_str(curlopt_post $ int, "")
+		
+		;var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		
+		;do curl.config_easy_response(&response)
+		;do curl.config_easy_header(&response)
+		
+		var resCode: int :: curl.easy_perform()
+		do me.errCheck(resCode, curl)
+		
+		var res: []char :: ""
+		;if(response.header <>& null)
+		;			do res :: res ~ response.header
+		;		end if
+		
+		;if(response.body <>& null)
+		;			do res :: res ~ "\n\n" ~ response.body
+		;		end if
+		do me.clean(curl)
+		ret res
 	end func
 end class

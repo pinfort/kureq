@@ -105,7 +105,7 @@ end enum
 			;ret "HTTP/3.0"
 		end switch
 	end func
-
+	
 	+func getStatusReasonPhraseFromCode(code: @StatusCode): []char
 		switch(code)
 		case %continue
