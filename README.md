@@ -38,4 +38,4 @@ Content-Length: 1
 ## info
 No verb other than GET supported yet.
 
-p.s. POST and HEAD are supported now but these are experimental.
+Update: POST and HEAD are supported now but these are experimental.
