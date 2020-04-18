@@ -1,4 +1,4 @@
 func main()
-	var request: \src\request@Request :: #\src\request@Request
+	var request: \src\http@Request :: #\src\http@Request
 	do cui@print(request.get("http://www.yahoo.co.jp"))
 end func

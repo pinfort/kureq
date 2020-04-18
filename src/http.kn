@@ -1,8 +1,11 @@
+include protocol
+include url
+
 +class Request()
-	var protocol: \src\protocol@Protocol
+	var protocol: @Protocol
 	
 	*func ctor()
-		do me.protocol :: #\src\protocol@Protocol
+		do me.protocol :: #@Protocol
 	end func
 	
 	func init(): \previous_research\pinfort\kuurl\src\curl@Curl

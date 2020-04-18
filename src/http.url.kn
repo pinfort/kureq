@@ -1,11 +1,11 @@
 +class Url()
-	var protocol: \src\protocol@Protocol
+	var protocol: @Protocol
 	
 	*func ctor()
-		do me.protocol :: #\src\protocol@Protocol
+		do me.protocol :: #@Protocol
 	end func
 	
-	+func getSchemeFromUrl(url: []char): \src\protocol@Scheme
+	+func getSchemeFromUrl(url: []char): @Scheme
 		var schemeStr: []char :: url.split(":")[0]
 		ret me.protocol.getSchemeFromStr(schemeStr)
 	end func

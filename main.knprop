@@ -13,9 +13,8 @@
 		<resource>previous_research\pinfort\kuurl\src\curl.code.kn</resource>
 		<resource>previous_research\pinfort\kuurl\src\curl.option.kn</resource>
 		<resource>previous_research\pinfort\kuurl\src\curl.response.kn</resource>
-		<resource>src\protocol.kn</resource>
-		<resource>src\request.kn</resource>
-		<resource>src\response.kn</resource>
-		<resource>src\url.kn</resource>
+		<resource>src\http.kn</resource>
+		<resource>src\http.protocol.kn</resource>
+		<resource>src\http.url.kn</resource>
 	</resources>
 </configuration>
