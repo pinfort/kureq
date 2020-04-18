@@ -59,6 +59,22 @@
 		ret res
 	end func
 	
+	+func getResponse(url: []char): \previous_research\pinfort\kuurl\src\curl@Response
+		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
+		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
+		do curl.easy_setopt_str(curlopt_url $ int, url)
+		
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		
+		do curl.config_easy_response(&response)
+		do curl.config_easy_header(&response)
+		
+		var resCode: int :: curl.easy_perform()
+		do me.errCheck(resCode, curl)
+		
+		ret response
+	end func
+	
 	+func head(url: []char): []char
 		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
