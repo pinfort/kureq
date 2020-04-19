@@ -67,6 +67,9 @@ include url
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
 		do curl.easy_setopt_str(curlopt_url $ int, url)
 		
+		var curlopt_redirect: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %FOLLOWLOCATION
+		do curl.easy_setopt_int(curlopt_redirect $ int, 1)
+		
 		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
 		
 		do curl.config_easy_response(&response)
