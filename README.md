@@ -1,11 +1,16 @@
 # Kureq
+
 HTTP request library
 
 easy to use!
 
-## Depends
-### KuURL
-git clone git@github.com:pinfort/kuurl.git ./previous_research/pinfort/kuurl
+## Quick start
+
+install dependency
+
+```
+./path/to/kpm.exe
+```
 
 ## example
 
@@ -36,6 +41,7 @@ Content-Length: 1
 ```
 
 ## info
+
 No verb other than GET supported yet.
 
 Update: POST and HEAD are supported now but these are experimental.
