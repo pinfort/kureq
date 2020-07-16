@@ -1,5 +1,6 @@
 func main()
 	var request: \src\http@Request :: #\src\http@Request
 	var postdata: []char :: "name=hjklhjksldjfkあにふぇにｆなｓo"
-	do cui@print(request.post("http://connectiontest.dev", postdata))
+	var postbin: []bit8 :: [1b8, 2b8, 3b8]
+	do cui@print(request.postBin("http://connectiontest.dev", postbin))
 end func

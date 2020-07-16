@@ -140,4 +140,40 @@ include url
 		do me.clean(curl)
 		ret res
 	end func
+	
+	+func postBin(url: []char, postdata: []bit8): []char
+		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
+		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
+		do curl.easy_setopt_str(curlopt_url $ int, url)
+		
+		
+		var curlopt_verbose: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %VERBOSE
+		do curl.easy_setopt_int(curlopt_verbose $ int, 1)
+		
+		var curlopt_postlen: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %POSTFIELDSIZE
+		do curl.easy_setopt_int(curlopt_postlen $ int, ^postdata)
+		
+		; POSTFIELDS not work because valiable will be GCed.
+		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %COPYPOSTFIELDS
+		do curl.easy_setopt_arr(curlopt_post $ int, postdata)
+		
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		
+		do curl.config_easy_response(&response)
+		do curl.config_easy_header(&response)
+		
+		var resCode: int :: curl.easy_perform()
+		do me.errCheck(resCode, curl)
+		
+		var res: []char :: ""
+		if(response.header <>& null)
+			do res :: res ~ response.header
+		end if
+		
+		if(response.body <>& null)
+			do res :: res ~ "\n\n" ~ response.body
+		end if
+		do me.clean(curl)
+		ret res
+	end func
 end class
