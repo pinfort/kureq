@@ -86,12 +86,11 @@ include url
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
 		do curl.easy_setopt_str(curlopt_url $ int, url)
 		
-		; TODO: なんでこれじゃダメか調べる
-		;var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %NOBODY
-		;do curl.easy_setopt_int(curlopt_head $ int, 1)
+		var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %NOBODY
+		do curl.easy_setopt_int(curlopt_head $ int, 1)
 		
-		var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %CUSTOMREQUEST
-		do curl.easy_setopt_str(curlopt_head $ int, "HEAD")
+		;var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %CUSTOMREQUEST
+		;do curl.easy_setopt_str(curlopt_head $ int, "HEAD")
 		
 		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
 		
@@ -109,13 +108,18 @@ include url
 		ret res
 	end func
 	
-	+func post(url: []char): []char
+	+func post(url: []char, postdata: []char): []char
 		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
 		do curl.easy_setopt_str(curlopt_url $ int, url)
 		
-		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %POSTFIELDS
-		do curl.easy_setopt_str(curlopt_post $ int, "")
+		
+		var curlopt_verbose: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %VERBOSE
+		do curl.easy_setopt_int(curlopt_verbose $ int, 1)
+		
+		; POSTFIELDS not work because valiable will be GCed.
+		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %COPYPOSTFIELDS
+		do curl.easy_setopt_str(curlopt_post $ int, postdata)
 		
 		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
 		

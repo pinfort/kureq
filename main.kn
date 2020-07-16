@@ -1,4 +1,5 @@
 func main()
 	var request: \src\http@Request :: #\src\http@Request
-	do cui@print(request.get("http://www.yahoo.co.jp"))
+	var postdata: []char :: "name=hjklhjksldjfkあにふぇにｆなｓo"
+	do cui@print(request.post("http://connectiontest.dev", postdata))
 end func
