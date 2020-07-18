@@ -157,6 +157,11 @@ include url
 		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %COPYPOSTFIELDS
 		do curl.easy_setopt_arr(curlopt_post $ int, postdata)
 		
+		var curlopt_post_header: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %HTTPHEADER
+		var slist: \previous_research\pinfort\kuurl\src\curl@Slist :: \previous_research\pinfort\kuurl\src\curl@makeSlist("Content-Type: application/octet-stream")
+		do slist :: slist.append("pragma: no-cache")
+		do curl.easy_setopt_slist(curlopt_post_header $ int, slist)
+		
 		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
 		
 		do curl.config_easy_response(&response)
