@@ -178,6 +178,7 @@ include url
 		if(response.body <>& null)
 			do res :: res ~ "\n\n" ~ response.body
 		end if
+		do slist.free_all()
 		do me.clean(curl)
 		ret res
 	end func
