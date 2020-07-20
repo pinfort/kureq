@@ -32,6 +32,22 @@ include url
 		throw excpt@userMin {TODO: エラーコードを考える}
 	end func
 	
+	func stringifyResponse(response: \previous_research\pinfort\kuurl\src\curl@Response): []char
+		var res: []char :: ""
+		if(response.header <>& null)
+			do res :: res ~ response.header
+		end if
+		
+		if(response.body <>& null)
+			if(^res = 0)
+				do res :: response.body
+			else
+				do res :: res ~ "\n\n" ~ response.body
+			end if
+		end if
+		ret res
+	end func
+	
 	+func get(url: []char): []char
 		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
@@ -45,18 +61,7 @@ include url
 		var resCode: int :: curl.easy_perform()
 		do me.errCheck(resCode, curl)
 		
-		var res: []char :: ""
-		if(response.header <>& null)
-			do res :: res ~ response.header
-		end if
-		
-		if(response.body <>& null)
-			if(^res = 0)
-				do res :: response.body
-			else
-				do res :: res ~ "\n\n" ~ response.body
-			end if
-		end if
+		var res: []char :: me.stringifyResponse(response)
 		
 		do me.clean(curl)
 		ret res
@@ -99,10 +104,7 @@ include url
 		var resCode: int :: curl.easy_perform()
 		do me.errCheck(resCode, curl)
 		
-		var res: []char :: ""
-		if(response.header <>& null)
-			do res :: res ~ response.header
-		end if
+		var res: []char :: me.stringifyResponse(response)
 		
 		do me.clean(curl)
 		ret res
@@ -129,14 +131,7 @@ include url
 		var resCode: int :: curl.easy_perform()
 		do me.errCheck(resCode, curl)
 		
-		var res: []char :: ""
-		if(response.header <>& null)
-			do res :: res ~ response.header
-		end if
-		
-		if(response.body <>& null)
-			do res :: res ~ "\n\n" ~ response.body
-		end if
+		var res: []char :: me.stringifyResponse(response)
 		do me.clean(curl)
 		ret res
 	end func
@@ -170,14 +165,7 @@ include url
 		var resCode: int :: curl.easy_perform()
 		do me.errCheck(resCode, curl)
 		
-		var res: []char :: ""
-		if(response.header <>& null)
-			do res :: res ~ response.header
-		end if
-		
-		if(response.body <>& null)
-			do res :: res ~ "\n\n" ~ response.body
-		end if
+		var res: []char :: me.stringifyResponse(response)
 		do slist.free_all()
 		do me.clean(curl)
 		ret res
