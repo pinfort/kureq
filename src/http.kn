@@ -3,20 +3,26 @@ include url
 
 +class Request()
 	var protocol: @Protocol
+	+var curl: \previous_research\pinfort\kuurl\src\curl@Curl
 	
 	*func ctor()
 		do me.protocol :: #@Protocol
+		do me.curl :: \previous_research\pinfort\kuurl\src\curl@makeCurl()
 	end func
 	
 	func init(): \previous_research\pinfort\kuurl\src\curl@Curl
-		ret \previous_research\pinfort\kuurl\src\curl@makeCurl()
+		do me.curl :: \previous_research\pinfort\kuurl\src\curl@makeCurl()
 	end func
 	
-	func clean(curl: \previous_research\pinfort\kuurl\src\curl@Curl)
-		do curl.easy_cleanup()
+	+func clean()
+		do me.curl.easy_cleanup()
 	end func
 	
-	func errCheck(responseCode: int, curl: \previous_research\pinfort\kuurl\src\curl@Curl)
+	func reset()
+		do me.curl.easy_reset()
+	end func
+	
+	func errCheck(responseCode: int)
 		var curle_ok: \previous_research\pinfort\kuurl\src\curl@CurlCode :: %OK
 		
 		if(responseCode = (curle_ok $ int))
@@ -28,146 +34,105 @@ include url
 		var curlCodeName: \previous_research\pinfort\kuurl\src\curl@CurlCodeName :: #\previous_research\pinfort\kuurl\src\curl@CurlCodeName
 		do cui@print("ERRORCODE: " ~ responseCode.toStr() ~ "\n")
 		do cui@print("ERROR: " ~ curlCodeName.fromCode(responseCode) ~ "\n")
-		do me.clean(curl)
+		do me.clean()
 		throw excpt@userMin {TODO: エラーコードを考える}
 	end func
 	
-	func stringifyResponse(response: \previous_research\pinfort\kuurl\src\curl@Response): []char
-		var res: []char :: ""
-		if(response.header <>& null)
-			do res :: res ~ response.header
-		end if
+	func perform(): \previous_research\pinfort\kuurl\src\curl@Response
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		do me.curl.config_easy_response(&response)
+		do me.curl.config_easy_header(&response)
 		
-		if(response.body <>& null)
-			if(^res = 0)
-				do res :: response.body
-			else
-				do res :: res ~ "\n\n" ~ response.body
-			end if
-		end if
-		ret res
+		var resCode: int :: me.curl.easy_perform()
+		do me.errCheck(resCode)
+		do me.reset()
+		ret response
 	end func
 	
 	+func get(url: []char): []char
-		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
-		do curl.easy_setopt_str(curlopt_url $ int, url)
+		do me.curl.easy_setopt_str(curlopt_url $ int, url)
 		
-		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: me.perform()
 		
-		do curl.config_easy_response(&response)
-		do curl.config_easy_header(&response)
+		var res: []char :: response.toStr()
 		
-		var resCode: int :: curl.easy_perform()
-		do me.errCheck(resCode, curl)
-		
-		var res: []char :: me.stringifyResponse(response)
-		
-		do me.clean(curl)
+		do me.reset()
 		ret res
 	end func
 	
 	+func getResponse(url: []char): \previous_research\pinfort\kuurl\src\curl@Response
-		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
-		do curl.easy_setopt_str(curlopt_url $ int, url)
+		do me.curl.easy_setopt_str(curlopt_url $ int, url)
 		
 		var curlopt_redirect: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %FOLLOWLOCATION
-		do curl.easy_setopt_int(curlopt_redirect $ int, 1)
+		do me.curl.easy_setopt_int(curlopt_redirect $ int, 1)
 		
-		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: me.perform()
 		
-		do curl.config_easy_response(&response)
-		do curl.config_easy_header(&response)
-		
-		var resCode: int :: curl.easy_perform()
-		do me.errCheck(resCode, curl)
-		
+		do me.reset()
 		ret response
 	end func
 	
 	+func head(url: []char): []char
-		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
-		do curl.easy_setopt_str(curlopt_url $ int, url)
+		do me.curl.easy_setopt_str(curlopt_url $ int, url)
 		
 		var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %NOBODY
-		do curl.easy_setopt_int(curlopt_head $ int, 1)
+		do me.curl.easy_setopt_int(curlopt_head $ int, 1)
 		
-		;var curlopt_head: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %CUSTOMREQUEST
-		;do curl.easy_setopt_str(curlopt_head $ int, "HEAD")
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: me.perform()
 		
-		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		var res: []char :: response.toStr()
 		
-		do curl.config_easy_header(&response)
-		
-		var resCode: int :: curl.easy_perform()
-		do me.errCheck(resCode, curl)
-		
-		var res: []char :: me.stringifyResponse(response)
-		
-		do me.clean(curl)
+		do me.reset()
 		ret res
 	end func
 	
 	+func post(url: []char, postdata: []char): []char
-		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
-		do curl.easy_setopt_str(curlopt_url $ int, url)
+		do me.curl.easy_setopt_str(curlopt_url $ int, url)
 		
 		
 		var curlopt_verbose: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %VERBOSE
-		do curl.easy_setopt_int(curlopt_verbose $ int, 1)
+		do me.curl.easy_setopt_int(curlopt_verbose $ int, 1)
 		
 		; POSTFIELDS not work because valiable will be GCed.
 		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %COPYPOSTFIELDS
-		do curl.easy_setopt_str(curlopt_post $ int, postdata)
+		do me.curl.easy_setopt_str(curlopt_post $ int, postdata)
 		
-		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: me.perform()
 		
-		do curl.config_easy_response(&response)
-		do curl.config_easy_header(&response)
-		
-		var resCode: int :: curl.easy_perform()
-		do me.errCheck(resCode, curl)
-		
-		var res: []char :: me.stringifyResponse(response)
-		do me.clean(curl)
+		var res: []char :: response.toStr()
+		do me.reset()
 		ret res
 	end func
 	
 	+func postBin(url: []char, postdata: []bit8): []char
-		var curl: \previous_research\pinfort\kuurl\src\curl@Curl :: me.init()
 		var curlopt_url: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %URL
-		do curl.easy_setopt_str(curlopt_url $ int, url)
+		do me.curl.easy_setopt_str(curlopt_url $ int, url)
 		
 		
 		var curlopt_verbose: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %VERBOSE
-		do curl.easy_setopt_int(curlopt_verbose $ int, 1)
+		do me.curl.easy_setopt_int(curlopt_verbose $ int, 1)
 		
 		var curlopt_postlen: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %POSTFIELDSIZE
-		do curl.easy_setopt_int(curlopt_postlen $ int, ^postdata)
+		do me.curl.easy_setopt_int(curlopt_postlen $ int, ^postdata)
 		
 		; POSTFIELDS not work because valiable will be GCed.
 		var curlopt_post: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %COPYPOSTFIELDS
-		do curl.easy_setopt_arr(curlopt_post $ int, postdata)
+		do me.curl.easy_setopt_arr(curlopt_post $ int, postdata)
 		
 		var curlopt_post_header: \previous_research\pinfort\kuurl\src\curl@CurlOption :: %HTTPHEADER
 		var slist: \previous_research\pinfort\kuurl\src\curl@Slist :: \previous_research\pinfort\kuurl\src\curl@makeSlist("Content-Type: application/octet-stream")
 		do slist :: slist.append("pragma: no-cache")
-		do curl.easy_setopt_slist(curlopt_post_header $ int, slist)
+		do me.curl.easy_setopt_slist(curlopt_post_header $ int, slist)
 		
-		var response: \previous_research\pinfort\kuurl\src\curl@Response :: #\previous_research\pinfort\kuurl\src\curl@Response
+		var response: \previous_research\pinfort\kuurl\src\curl@Response :: me.perform()
 		
-		do curl.config_easy_response(&response)
-		do curl.config_easy_header(&response)
-		
-		var resCode: int :: curl.easy_perform()
-		do me.errCheck(resCode, curl)
-		
-		var res: []char :: me.stringifyResponse(response)
+		var res: []char :: response.toStr()
 		do slist.free_all()
-		do me.clean(curl)
+		do me.reset()
 		ret res
 	end func
 end class

@@ -2,5 +2,9 @@ func main()
 	var request: \src\http@Request :: #\src\http@Request
 	var postdata: []char :: "name=hjklhjksldjfkあにふぇにｆなｓo"
 	var postbin: []bit8 :: [1b8, 2b8, 3b8]
-	do cui@print(request.postBin("http://connectiontest.dev", postbin))
+	;do cui@print(request.postBin("http://connectiontest.dev", postbin))
+	do request.curl.easy_reset()
+	
+	do cui@print(request.get("http://connectiontest.dev"))
+	do request.clean()
 end func
